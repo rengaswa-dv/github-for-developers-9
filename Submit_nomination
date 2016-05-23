@@ -17,7 +17,7 @@ nomineeComment = "Bob is the hardest working person that I know. he is the first
 				 "he is always positive and provides a pleasant working environment. He always greets you with a smile. Bob is the rock of the QA services" & _
 				 "he is what makes us great! Bob’s outstanding performance is a daily occurrence. Examples of his outstanding performance can be witnessed" &_
 				 "and appreciated whenever you have an interaction with him. Everyday he provides a can do attitude that is contagious to everybody."
-
+'Wait has been Removed
 searchBy = "Last Name" , "Orgunit"
 searchValue = data("R_lastname")'"charles"
 nomineeList = data("R_Fullname")'"Charles, Frank"
@@ -30,9 +30,9 @@ Dim objBrowser
 
 Set objBrowser = Browser("G5_PAX").Page("G5_PAX_Home")
 
-Wait(20)
+
 Tvalue = objBrowser.webelement("html tag:=DIV","innerhtml:=.*submitNomination.do.*", "index:=0").GetROProperty("innerhtml")
-Wait(10)
+
 If objBrowser.webelement("html tag:=DIV","innerhtml:=.*submitNomination.do.*", "index:=0").Exist(0) then
 
 	' Select promotion to submit nomination.
