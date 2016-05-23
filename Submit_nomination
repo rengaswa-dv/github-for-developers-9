@@ -25,7 +25,7 @@ nomineeList = data("R_Fullname")'"Charles, Frank"
 formComment = "Form test comment"
 
 ' Check for Nomination tile in home page filter
-
+'Setting the browser object
 Dim objBrowser
 
 Set objBrowser = Browser("G5_PAX").Page("G5_PAX_Home")
