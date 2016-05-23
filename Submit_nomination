@@ -7,7 +7,6 @@ Public Function Submit_nomination()
 		iRow = Row                        'Row Number
 		
 		Set Data = DataBuilder.Load(sWorkBook, vSheet, iRow)
- Wait(10)
 
 'Parameters required to submit nomination for the nominee(s)
 promoName = data("Promotion_Name")'"GM-Nomination"
@@ -19,7 +18,7 @@ nomineeComment = "Bob is the hardest working person that I know. he is the first
 				 "he is what makes us great! Bob’s outstanding performance is a daily occurrence. Examples of his outstanding performance can be witnessed" &_
 				 "and appreciated whenever you have an interaction with him. Everyday he provides a can do attitude that is contagious to everybody."
 
-searchBy = "Last Name"
+searchBy = "Last Name" , "Orgunit"
 searchValue = data("R_lastname")'"charles"
 nomineeList = data("R_Fullname")'"Charles, Frank"
 'wizardOrder = array("Behavior","Ecard","Why")
