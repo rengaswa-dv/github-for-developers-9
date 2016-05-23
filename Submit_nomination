@@ -1,0 +1,156 @@
+Public Function Submit_nomination()
+
+ 		Set DataBuilder = New DataClass
+			
+		sWorkBook = Path        'WorkBook
+		vSheet = Sheet                'WorkSheet
+		iRow = Row                        'Row Number
+		
+		Set Data = DataBuilder.Load(sWorkBook, vSheet, iRow)
+ Wait(10)
+
+'Parameters required to submit nomination for the nominee(s)
+promoName = data("Promotion_Name")'"GM-Nomination"
+nomineeType = data("Team")'"Individual"
+nomineeBehavior = "Ideas"
+nomineeCard = "1st Year Celebration"
+nomineeComment = "Bob is the hardest working person that I know. he is the first to arrive and the last to leave." & _
+				 "he is always positive and provides a pleasant working environment. He always greets you with a smile. Bob is the rock of the QA services" & _
+				 "he is what makes us great! Bob’s outstanding performance is a daily occurrence. Examples of his outstanding performance can be witnessed" &_
+				 "and appreciated whenever you have an interaction with him. Everyday he provides a can do attitude that is contagious to everybody."
+
+searchBy = "Last Name"
+searchValue = data("R_lastname")'"charles"
+nomineeList = data("R_Fullname")'"Charles, Frank"
+'wizardOrder = array("Behavior","Ecard","Why")
+formComment = "Form test comment"
+
+' Check for Nomination tile in home page filter
+
+Dim objBrowser
+
+Set objBrowser = Browser("G5_PAX").Page("G5_PAX_Home")
+
+Wait(20)
+Tvalue = objBrowser.webelement("html tag:=DIV","innerhtml:=.*submitNomination.do.*", "index:=0").GetROProperty("innerhtml")
+Wait(10)
+If objBrowser.webelement("html tag:=DIV","innerhtml:=.*submitNomination.do.*", "index:=0").Exist(0) then
+
+	' Select promotion to submit nomination.
+	
+	If objBrowser.WebList("promoId").Exist(0) Then
+		
+		objBrowser.WebList("promoId").Select promoName
+		objBrowser.WebButton("Nominate Someone").Click
+		
+		' Displays Submit Nomination page 
+
+		Set objBrowser = Browser("G5_PAX").Page("G5_PAX_Send_Recognition")
+
+		' Selects Individual or Team for submitting nomination
+		objBrowser.Webelement("html tag:=label", "innertext:=.* & nomineeType.*").click
+		If data("Team")="Team" Then
+			objBrowser.WebEdit("html id:=teamName").Set data("Node")
+		End If
+		'objBrowser.Webelement("name:=individualOrTeam").Select nomineeType
+		objBrowser.WebButton("name:=Next","index:=0").Click
+		
+		'finds Nominee by last name and select them. Clicks Next
+		
+		objBrowser.WebList("name:=Select", "index:=1").Select searchBy
+		objBrowser.WebEdit("WebEdit_3").object.focus
+		Wait(2)
+		Call SendKeys (searchValue)
+		Wait(10)
+		Call SendKeys ("{ENTER}")
+		Wait(20)
+		
+		findNominee = objBrowser.WebTable("name:=Select All").GetRowWithCellText(nomineeList,2)
+		Wait(5)
+
+		objBrowser.WebTable("name:=Select All").ChildItem(findNominee,2,"Link",0).Click
+		objBrowser.WebButton("name:=Next","index:=1").Click
+		
+		'For i = 1 To (ubound(wizardOrder)+1)
+			
+		'Select Case wizardOrder(i-1)
+			
+		'Case "Behavior"
+		Wait(5)
+			
+		'Selects behavior for the nominee(s) and Clicks Next
+	If data("Behavior")="Enabled" Then
+		objBrowser.Webelement("html tag:= LABEL","innerhtml:=.*" & nomineeBehavior & ".*").click
+			objBrowser.WebButton("name:=Next","index:=0").Click	
+		'Case "Ecard"
+		Wait(5)
+		
+	End If	
+		'Choose eCard/Certificate for nominee(s) and Clicks Next
+	If data("Ecard")="Enabled" Then	
+		
+		 objBrowser.Image("alt:=" & nomineeCard).Click
+				
+		'Enters the comment and Submit Nomination
+		
+		'Case "Why"
+		Wait(5)
+	'If data("Behavior")="Disable" Then	
+		'objBrowser.WebButton("name:=Next").Click
+		objBrowser.WebButton("name:=Next","index:=0").Click
+	'End If
+	End If
+	Wait(5)	
+	If data("Why")="Enabled" Then	
+	
+			Set oEdit = objBrowser.frame("html tag:=IFRAME","index:=0").Webelement("html tag:=body","index:=0")
+			'Set the focus
+			oEdit.Click
+			 Wait(5)
+			'Create device replay object
+			Set oDR = CreateObject("Mercury.DeviceReplay")
+			 'Send some text
+			oDR.SendString nomineeComment
+			Set oDR = nothing
+			
+			
+	
+'		objBrowser.frame("html tag:=IFRAME","index:=0").Webelement("html tag:=body","index:=0").object.focus
+'		objBrowser.frame("html tag:=IFRAME","index:=0").Webelement("html tag:=body","index:=0").Object.innertext = nomineeComment
+	End If
+	Wait(5)	
+	If data("Behavior")="Enabled" Then
+		'objBrowser.WebButton("name:=Next").Click
+		objBrowser.WebButton("name:=Next","index:=0").Click
+		'End Select
+		
+		'Clicks Next after entering values based on wizard order
+		'If i < (ubound(wizardOrder)+1) Then
+			'objBrowser.WebButton("name:=Next","index:=" & (i+1)).Click
+		'End If
+			
+		'Next
+		
+		'Form Element
+		
+		objBrowser.Webelement("html tag:=TEXTAREA","index:=0").object.focus
+		objBrowser.Webelement("html tag:=TEXTAREA","index:=0").object.innertext =formComment
+	End If			
+		objBrowser.WebButton("Submit Nomination").Click
+		Wait(5)
+		'Returns to home page
+		objBrowser.Link("Home").Click
+	Reporter.ReportEvent micPass, "Submit Nomination - Passed","Submit Nomination is Passed"
+Else
+
+ Reporter.ReportEvent micFail, "Nomination Promotion", "Select Nomination Promotion dropdown doesn't display in nomination tile " 
+
+End If
+
+Else
+
+ Reporter.ReportEvent micFail, "Nomination Tile", "Nomination Tile doesn't exist in home page filter" 
+
+End if
+
+End Function
